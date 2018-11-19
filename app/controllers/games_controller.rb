@@ -13,15 +13,35 @@ class GamesController < ApplicationController
   def score
     @longest_word = params[:longest_word]
     @grid = params[:grid]
+    @score = session[:score]
 
-    sorted_grid = @grid.split(' ').sort.group_by { |i| i }.map { |k, v| [k, v.length] }.to_h
-    @sorted_word = @longest_word.upcase.split('').sort.group_by { |i| i }.map { |k, v| [k, v.length] }.to_h
+    url = 'https://wagon-dictionary.herokuapp.com/' + @longest_word
+    word_dictionary = JSON.parse(open(url).read)
 
-    @comparison = @sorted_word.map do |letter, number|
+    @word_in_grid = word_in_grid?(@longest_word, @grid)
+    @english_word = word_dictionary['found'] ? true : false
+
+    if session[:score]
+      session[:score] += @longest_word.size if @word_in_grid && @english_word
+    else
+      session[:score] = 0
+    end
+  end
+
+  private
+
+  def word_in_grid?(word, grid)
+    sorted_grid = number_of_letters(grid)
+    sorted_word = number_of_letters(word)
+
+    comparison = sorted_word.map do |letter, number|
       sorted_grid.key?(letter) && sorted_grid[letter] >= number
     end
 
-    url = 'https://wagon-dictionary.herokuapp.com/' + @longest_word
-    @word_dictionary = JSON.parse(open(url).read)
+    comparison.include?(false) ? false : true
+  end
+
+  def number_of_letters(word)
+    word.upcase.split('').sort.group_by { |i| i }.map { |k, v| [k, v.length] }.to_h
   end
 end

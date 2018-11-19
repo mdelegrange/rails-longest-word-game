@@ -1,13 +1,19 @@
 <h1>Result</h1>
 <p>Find me in app/views/games/score.html.erb</p>
 
-<% if @word_dictionary['found'] && @comparison.include?(false) == false%>
+<p>Your score is : <%= @score %></p>
+
+<% if @word_in_grid && @english_word %>
   <p><strong>Congratulations! </strong><%= @longest_word.upcase%> is a valid English word!</p>
-<% elsif @word_dictionary['found'] && @comparison.include?(false)%>
+  <br>
+  <p>You earn <%= @longest_word.length %> points !</p>
+<% elsif @english_word %>
   <p>Sorry but <strong><%= @longest_word.upcase%></strong> can't be build out of <%= @grid %></p>
 <% else %>
   <p>Sorry but <strong><%= @longest_word.upcase%></strong> does not seem to be a valid English word!</p>
 <% end %>
+
+
 
 
 <div>
